@@ -51,7 +51,15 @@ describe("checkWinner", () => {
     expect(checkWinner(board)).toBeNull();
   });
 
-  // Test all 8 win lines for X
+  test("returns null for a full draw board", () => {
+    // X O X
+    // X O O
+    // O X X  — draw, no winner
+    const board = ["X", "O", "X", "X", "O", "O", "O", "X", "X"];
+    expect(checkWinner(board)).toBeNull();
+  });
+
+  // Test all 8 win lines for X and O
   const WIN_LINES = [
     [0, 1, 2],
     [3, 4, 5],
@@ -118,7 +126,6 @@ describe("checkDraw", () => {
   });
 
   test("returns false for a full board that has a winner", () => {
-    // Fill mostly, but X wins top row
     // X X X
     // O O X
     // O X O
@@ -136,6 +143,12 @@ describe("handleCellClick", () => {
 
   beforeEach(() => {
     game = loadGame();
+  });
+
+  test("player X always takes the first turn", () => {
+    expect(game.getState().currentPlayer).toBe("X");
+    game.handleCellClick(4);
+    expect(game.getState().board[4]).toBe("X");
   });
 
   test("clicking an empty cell places the current player's mark", () => {
@@ -161,8 +174,7 @@ describe("handleCellClick", () => {
     expect(JSON.stringify(game.getState())).toBe(stateBefore);
   });
 
-  test("clicking after game over (winner) leaves state unchanged", () => {
-    // Set up a winning state for X (top row)
+  test("clicking after game over (X winner) leaves state unchanged", () => {
     game.handleCellClick(0); // X
     game.handleCellClick(3); // O
     game.handleCellClick(1); // X
@@ -171,6 +183,18 @@ describe("handleCellClick", () => {
 
     const stateBefore = JSON.stringify(game.getState());
     game.handleCellClick(5); // should be no-op
+    expect(JSON.stringify(game.getState())).toBe(stateBefore);
+  });
+
+  test("clicking after game over (draw) leaves state unchanged", () => {
+    // X O X / X O O / O X X — draw
+    const moves = [0, 1, 2, 4, 3, 5, 7, 6, 8];
+    moves.forEach((i) => game.handleCellClick(i));
+    expect(game.getState().winner).toBe("draw");
+
+    const stateBefore = JSON.stringify(game.getState());
+    // All cells are filled so any index is occupied; guard must block on winner too
+    game.handleCellClick(0);
     expect(JSON.stringify(game.getState())).toBe(stateBefore);
   });
 
@@ -186,8 +210,21 @@ describe("handleCellClick", () => {
     expect(s.winningLine).toEqual([0, 1, 2]);
   });
 
+  test("O can win and state reflects O as winner", () => {
+    // O wins middle column [1,4,7]
+    game.handleCellClick(0); // X
+    game.handleCellClick(1); // O
+    game.handleCellClick(3); // X
+    game.handleCellClick(4); // O
+    game.handleCellClick(8); // X (no win yet)
+    game.handleCellClick(7); // O wins [1,4,7]
+
+    const s = game.getState();
+    expect(s.winner).toBe("O");
+    expect(s.winningLine).toEqual([1, 4, 7]);
+  });
+
   test("draw is detected and sets winner to 'draw'", () => {
-    // Play out a draw:
     // X O X
     // X O O
     // O X X
@@ -195,6 +232,21 @@ describe("handleCellClick", () => {
     moves.forEach((i) => game.handleCellClick(i));
     expect(game.getState().winner).toBe("draw");
     expect(game.getState().winningLine).toBeNull();
+  });
+
+  test("draw is not declared until all 9 cells are filled", () => {
+    // Play 8 moves without a winner — no draw yet
+    game.handleCellClick(0); // X
+    game.handleCellClick(1); // O
+    game.handleCellClick(2); // X
+    game.handleCellClick(4); // O
+    game.handleCellClick(3); // X
+    game.handleCellClick(5); // O
+    game.handleCellClick(7); // X
+    game.handleCellClick(6); // O  — 8 moves played, board not full
+    expect(game.getState().winner).toBeNull();
+    game.handleCellClick(8); // X — 9th move completes the board as a draw
+    expect(game.getState().winner).toBe("draw");
   });
 });
 
@@ -221,7 +273,7 @@ describe("resetGame", () => {
     expect(s.winningLine).toBeNull();
   });
 
-  test("resetGame restores state after a finished game", () => {
+  test("resetGame restores state after a finished game (X wins)", () => {
     game.handleCellClick(0); // X
     game.handleCellClick(3); // O
     game.handleCellClick(1); // X
@@ -234,6 +286,28 @@ describe("resetGame", () => {
     expect(s.currentPlayer).toBe("X");
     expect(s.winner).toBeNull();
     expect(s.winningLine).toBeNull();
+  });
+
+  test("resetGame restores state after a draw", () => {
+    const moves = [0, 1, 2, 4, 3, 5, 7, 6, 8];
+    moves.forEach((i) => game.handleCellClick(i));
+    expect(game.getState().winner).toBe("draw");
+    game.resetGame();
+
+    const s = game.getState();
+    expect(s.board).toEqual(Array(9).fill(null));
+    expect(s.currentPlayer).toBe("X");
+    expect(s.winner).toBeNull();
+    expect(s.winningLine).toBeNull();
+  });
+
+  test("after resetGame a cell can be clicked and X goes first", () => {
+    game.handleCellClick(0); // X
+    game.handleCellClick(1); // O
+    game.resetGame();
+    game.handleCellClick(5);
+    expect(game.getState().board[5]).toBe("X");
+    expect(game.getState().currentPlayer).toBe("O");
   });
 });
 
@@ -266,13 +340,25 @@ describe("DOM integration", () => {
     expect(statusEl.textContent).toBe("Player X's turn");
   });
 
-  test("cell element gets data-mark attribute after click", () => {
+  test("cell element gets data-mark X after click on empty cell", () => {
     game.handleCellClick(4);
     const cell = document.getElementById("cell-4");
     expect(cell.getAttribute("data-mark")).toBe("X");
   });
 
-  test("winning cells receive .winning CSS class", () => {
+  test("cell element gets data-mark O on O's turn", () => {
+    game.handleCellClick(4); // X
+    game.handleCellClick(0); // O
+    expect(document.getElementById("cell-0").getAttribute("data-mark")).toBe("O");
+  });
+
+  test("occupied cell data-mark is unchanged after repeated click", () => {
+    game.handleCellClick(0); // X
+    game.handleCellClick(0); // no-op
+    expect(document.getElementById("cell-0").getAttribute("data-mark")).toBe("X");
+  });
+
+  test("winning cells receive .winning CSS class — X wins", () => {
     game.handleCellClick(0); // X
     game.handleCellClick(3); // O
     game.handleCellClick(1); // X
@@ -282,9 +368,34 @@ describe("DOM integration", () => {
     expect(document.getElementById("cell-0").classList.contains("winning")).toBe(true);
     expect(document.getElementById("cell-1").classList.contains("winning")).toBe(true);
     expect(document.getElementById("cell-2").classList.contains("winning")).toBe(true);
-    // Non-winning cells should not have the class
+    // Non-winning cells must NOT have the class
     expect(document.getElementById("cell-3").classList.contains("winning")).toBe(false);
     expect(document.getElementById("cell-4").classList.contains("winning")).toBe(false);
+    expect(document.getElementById("cell-5").classList.contains("winning")).toBe(false);
+  });
+
+  test("winning cells receive .winning CSS class — O wins", () => {
+    // O wins middle column [1,4,7]
+    game.handleCellClick(0); // X
+    game.handleCellClick(1); // O
+    game.handleCellClick(3); // X
+    game.handleCellClick(4); // O
+    game.handleCellClick(8); // X
+    game.handleCellClick(7); // O wins [1,4,7]
+
+    expect(document.getElementById("cell-1").classList.contains("winning")).toBe(true);
+    expect(document.getElementById("cell-4").classList.contains("winning")).toBe(true);
+    expect(document.getElementById("cell-7").classList.contains("winning")).toBe(true);
+    expect(document.getElementById("cell-0").classList.contains("winning")).toBe(false);
+    expect(document.getElementById("cell-3").classList.contains("winning")).toBe(false);
+  });
+
+  test("no .winning class on any cell in a draw game", () => {
+    const moves = [0, 1, 2, 4, 3, 5, 7, 6, 8];
+    moves.forEach((i) => game.handleCellClick(i));
+    for (let i = 0; i < 9; i++) {
+      expect(document.getElementById(`cell-${i}`).classList.contains("winning")).toBe(false);
+    }
   });
 
   test("result banner is hidden before game ends", () => {
@@ -305,8 +416,22 @@ describe("DOM integration", () => {
     expect(resultText.textContent).toContain("Player X wins");
   });
 
+  test("result banner shows win message after O wins", () => {
+    // O wins middle column [1,4,7]
+    game.handleCellClick(0); // X
+    game.handleCellClick(1); // O
+    game.handleCellClick(3); // X
+    game.handleCellClick(4); // O
+    game.handleCellClick(8); // X
+    game.handleCellClick(7); // O wins
+
+    const banner = document.getElementById("result-banner");
+    const resultText = document.getElementById("result-text");
+    expect(banner.hidden).toBe(false);
+    expect(resultText.textContent).toContain("Player O wins");
+  });
+
   test("result banner shows draw message on draw", () => {
-    // X O X / X O O / O X X
     const moves = [0, 1, 2, 4, 3, 5, 7, 6, 8];
     moves.forEach((i) => game.handleCellClick(i));
 
@@ -316,7 +441,7 @@ describe("DOM integration", () => {
     expect(resultText.textContent).toContain("draw");
   });
 
-  test("board has game-over class after game ends", () => {
+  test("board has game-over class after X wins", () => {
     game.handleCellClick(0); // X
     game.handleCellClick(3); // O
     game.handleCellClick(1); // X
@@ -326,12 +451,28 @@ describe("DOM integration", () => {
     expect(document.getElementById("board").classList.contains("game-over")).toBe(true);
   });
 
-  test("cells are disabled after game ends", () => {
+  test("board has game-over class after a draw", () => {
+    const moves = [0, 1, 2, 4, 3, 5, 7, 6, 8];
+    moves.forEach((i) => game.handleCellClick(i));
+
+    expect(document.getElementById("board").classList.contains("game-over")).toBe(true);
+  });
+
+  test("cells are disabled after X wins", () => {
     game.handleCellClick(0); // X
     game.handleCellClick(3); // O
     game.handleCellClick(1); // X
     game.handleCellClick(4); // O
     game.handleCellClick(2); // X wins
+
+    for (let i = 0; i < 9; i++) {
+      expect(document.getElementById(`cell-${i}`).disabled).toBe(true);
+    }
+  });
+
+  test("cells are disabled after a draw", () => {
+    const moves = [0, 1, 2, 4, 3, 5, 7, 6, 8];
+    moves.forEach((i) => game.handleCellClick(i));
 
     for (let i = 0; i < 9; i++) {
       expect(document.getElementById(`cell-${i}`).disabled).toBe(true);
@@ -348,6 +489,30 @@ describe("DOM integration", () => {
       expect(cell.getAttribute("data-mark")).toBeNull();
       expect(cell.classList.contains("winning")).toBe(false);
     }
+  });
+
+  test("restart re-enables all cells after a finished game", () => {
+    game.handleCellClick(0); // X
+    game.handleCellClick(3); // O
+    game.handleCellClick(1); // X
+    game.handleCellClick(4); // O
+    game.handleCellClick(2); // X wins
+    game.resetGame();
+
+    for (let i = 0; i < 9; i++) {
+      expect(document.getElementById(`cell-${i}`).disabled).toBe(false);
+    }
+  });
+
+  test("restart removes game-over class from board", () => {
+    game.handleCellClick(0); // X
+    game.handleCellClick(3); // O
+    game.handleCellClick(1); // X
+    game.handleCellClick(4); // O
+    game.handleCellClick(2); // X wins
+    game.resetGame();
+
+    expect(document.getElementById("board").classList.contains("game-over")).toBe(false);
   });
 
   test("restart hides result banner", () => {
