@@ -1,0 +1,23 @@
+{
+  "name": "tic-tac-toe",
+  "version": "1.0.0",
+  "description": "Vanilla JS Tic Tac Toe game",
+  "main": "game.js",
+  "scripts": {
+    "test": "jest --testEnvironment=jsdom"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/damienhampton/tic-tac-toe-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  }
+}
