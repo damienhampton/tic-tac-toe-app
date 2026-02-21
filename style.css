@@ -1,0 +1,377 @@
+/* =====================================================
+   CSS Custom Properties
+   ===================================================== */
+:root {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-hover: #273549;
+  --color-border: #334155;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-x: #60a5fa;       /* blue-400 */
+  --color-x-glow: rgba(96, 165, 250, 0.25);
+  --color-o: #f87171;       /* red-400 */
+  --color-o-glow: rgba(248, 113, 113, 0.25);
+  --color-winning-bg: #1e3a5f;
+  --color-winning-border: #60a5fa;
+  --color-accent: #818cf8;  /* indigo-400 */
+  --color-restart: #4f46e5;
+  --color-restart-hover: #6366f1;
+  --radius-cell: 16px;
+  --radius-board: 20px;
+  --radius-btn: 12px;
+  --cell-size: clamp(80px, 26vw, 140px);
+  --gap: clamp(8px, 2vw, 14px);
+  --font-cell: clamp(2rem, 10vw, 4rem);
+  --transition-standard: 200ms ease;
+  --transition-pop: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* =====================================================
+   Reset & Base
+   ===================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+
+/* =====================================================
+   App Shell
+   ===================================================== */
+.app {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* =====================================================
+   Header
+   ===================================================== */
+.app-header {
+  text-align: center;
+}
+
+.app-title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--color-x) 0%, var(--color-accent) 50%, var(--color-o) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* =====================================================
+   Game Area
+   ===================================================== */
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* =====================================================
+   Status Bar
+   ===================================================== */
+.status-bar {
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-message {
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.01em;
+  transition: color var(--transition-standard);
+}
+
+.status-message.player-x {
+  color: var(--color-x);
+}
+
+.status-message.player-o {
+  color: var(--color-o);
+}
+
+/* =====================================================
+   Board
+   ===================================================== */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size));
+  grid-template-rows: repeat(3, var(--cell-size));
+  gap: var(--gap);
+  padding: var(--gap);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-board);
+  border: 1px solid var(--color-border);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 20px 40px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* When game is over, disable pointer interactions on board */
+.board.game-over {
+  pointer-events: none;
+}
+
+/* =====================================================
+   Cells
+   ===================================================== */
+.cell {
+  aspect-ratio: 1;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-cell);
+  cursor: pointer;
+  font-size: var(--font-cell);
+  font-weight: 800;
+  font-family: inherit;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Pop-in animation for mark appearance */
+  transition:
+    background-color var(--transition-standard),
+    border-color var(--transition-standard),
+    transform var(--transition-standard),
+    box-shadow var(--transition-standard);
+  position: relative;
+  overflow: hidden;
+  /* Ensure minimum tap target */
+  min-width: 44px;
+  min-height: 44px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.cell:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.4);
+}
+
+.cell:not([data-mark]):hover,
+.cell[data-mark=""]:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-accent);
+  transform: scale(1.03);
+}
+
+/* Mark pseudo-element for the animation */
+.cell::after {
+  content: attr(data-mark);
+  display: block;
+  opacity: 0;
+  transform: scale(0.4) rotate(-15deg);
+  transition:
+    opacity var(--transition-pop),
+    transform var(--transition-pop);
+}
+
+.cell[data-mark="X"]::after,
+.cell[data-mark="O"]::after {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* X styling */
+.cell[data-mark="X"] {
+  color: var(--color-x);
+  border-color: rgba(96, 165, 250, 0.4);
+  background-color: rgba(96, 165, 250, 0.06);
+  cursor: default;
+}
+
+.cell[data-mark="X"]::after {
+  color: var(--color-x);
+}
+
+/* O styling */
+.cell[data-mark="O"] {
+  color: var(--color-o);
+  border-color: rgba(248, 113, 113, 0.4);
+  background-color: rgba(248, 113, 113, 0.06);
+  cursor: default;
+}
+
+.cell[data-mark="O"]::after {
+  color: var(--color-o);
+}
+
+/* Winning cell highlight */
+.cell.winning {
+  animation: winPulse 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.cell.winning[data-mark="X"] {
+  background-color: rgba(96, 165, 250, 0.2);
+  border-color: var(--color-x);
+  box-shadow:
+    0 0 0 2px var(--color-x),
+    0 0 20px var(--color-x-glow),
+    inset 0 0 20px var(--color-x-glow);
+}
+
+.cell.winning[data-mark="O"] {
+  background-color: rgba(248, 113, 113, 0.2);
+  border-color: var(--color-o);
+  box-shadow:
+    0 0 0 2px var(--color-o),
+    0 0 20px var(--color-o-glow),
+    inset 0 0 20px var(--color-o-glow);
+}
+
+@keyframes winPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  70% { transform: scale(0.96); }
+  100% { transform: scale(1.05); }
+}
+
+/* =====================================================
+   Result Banner
+   ===================================================== */
+.result-banner {
+  background: linear-gradient(135deg, var(--color-surface) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  padding: 1rem 2rem;
+  text-align: center;
+  animation: fadeSlideIn 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.result-banner[hidden] {
+  display: none;
+}
+
+.result-text {
+  font-size: clamp(1.1rem, 5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =====================================================
+   Restart Button
+   ===================================================== */
+.restart-btn {
+  font-family: inherit;
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--color-restart);
+  border: none;
+  border-radius: var(--radius-btn);
+  padding: 0.75rem 2rem;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-standard),
+    transform var(--transition-standard),
+    box-shadow var(--transition-standard);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  min-height: 44px;
+  outline: none;
+}
+
+.restart-btn:hover {
+  background: var(--color-restart-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+}
+
+.restart-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.restart-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.5);
+}
+
+/* =====================================================
+   Responsive — small phones
+   ===================================================== */
+@media (max-width: 480px) {
+  body {
+    padding: 1rem 0.5rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .app {
+    gap: 1.25rem;
+  }
+
+  .game {
+    gap: 1.25rem;
+  }
+
+  .board {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: min(92vw, 360px);
+    padding: clamp(6px, 1.5vw, 10px);
+    gap: clamp(6px, 1.5vw, 10px);
+  }
+
+  /* Make cells fill the board on small screens */
+  .cell {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Respect motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .cell,
+  .cell::after,
+  .result-banner,
+  .restart-btn {
+    animation: none !important;
+    transition: none !important;
+  }
+}

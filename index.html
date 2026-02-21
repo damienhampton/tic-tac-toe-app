@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <h1 class="app-title">Tic Tac Toe</h1>
+      </header>
+
+      <main class="game">
+        <div class="status-bar">
+          <p id="status-message" class="status-message" aria-live="polite">
+            Player X's turn
+          </p>
+        </div>
+
+        <div
+          id="board"
+          class="board"
+          role="grid"
+          aria-label="Tic Tac Toe board"
+        >
+          <button
+            class="cell"
+            id="cell-0"
+            data-index="0"
+            role="gridcell"
+            aria-label="Row 1, Column 1"
+          ></button>
+          <button
+            class="cell"
+            id="cell-1"
+            data-index="1"
+            role="gridcell"
+            aria-label="Row 1, Column 2"
+          ></button>
+          <button
+            class="cell"
+            id="cell-2"
+            data-index="2"
+            role="gridcell"
+            aria-label="Row 1, Column 3"
+          ></button>
+          <button
+            class="cell"
+            id="cell-3"
+            data-index="3"
+            role="gridcell"
+            aria-label="Row 2, Column 1"
+          ></button>
+          <button
+            class="cell"
+            id="cell-4"
+            data-index="4"
+            role="gridcell"
+            aria-label="Row 2, Column 2"
+          ></button>
+          <button
+            class="cell"
+            id="cell-5"
+            data-index="5"
+            role="gridcell"
+            aria-label="Row 2, Column 3"
+          ></button>
+          <button
+            class="cell"
+            id="cell-6"
+            data-index="6"
+            role="gridcell"
+            aria-label="Row 3, Column 1"
+          ></button>
+          <button
+            class="cell"
+            id="cell-7"
+            data-index="7"
+            role="gridcell"
+            aria-label="Row 3, Column 2"
+          ></button>
+          <button
+            class="cell"
+            id="cell-8"
+            data-index="8"
+            role="gridcell"
+            aria-label="Row 3, Column 3"
+          ></button>
+        </div>
+
+        <div id="result-banner" class="result-banner" aria-live="assertive" hidden>
+          <p id="result-text" class="result-text"></p>
+        </div>
+
+        <button id="restart-btn" class="restart-btn" type="button">
+          Restart Game
+        </button>
+      </main>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>
