@@ -41,7 +41,8 @@
   padding: var(--gap);
 }
 
-/* Mark pop-in animation via pseudo-element */
+/* Mark pop-in animation via pseudo-element
+   (cannot be expressed with Tailwind utilities alone) */
 .cell::after {
   content: attr(data-mark);
   display: block;
@@ -155,7 +156,7 @@
     pointer-events: none;
   }
 
-  /* Status message colour variants */
+  /* Status message colour variants — used by game.js render() */
   .status-player-x {
     color: #60a5fa;
   }
