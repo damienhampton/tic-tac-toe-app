@@ -2,7 +2,7 @@
 
 ## Description
 
-A browser-based, two-player Tic Tac Toe game built with plain HTML5, CSS3, and vanilla JavaScript — no frameworks, no build step required.
+A browser-based, two-player Tic Tac Toe game built with plain HTML5, Tailwind CSS v4, and vanilla JavaScript.
 
 ## Features
 
@@ -25,31 +25,31 @@ A browser-based, two-player Tic Tac Toe game built with plain HTML5, CSS3, and v
 | Layer | Technology |
 |---|---|
 | Markup | Plain HTML5 |
-| Styling | CSS3 — custom properties, CSS animations |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) — utility classes + custom `@keyframes` in the CSS entry file |
 | Logic | Vanilla JavaScript (ES5 strict mode, ES6 features such as `const`, `let`, arrow functions, template literals, and `Array` methods) |
 | Tests | [Jest](https://jestjs.io/) with the `jsdom` environment |
-| Dev server | [live-server](https://github.com/tapio/live-server) |
-
-There is no bundler, transpiler, or framework involved.
+| Dev server / bundler | [Vite](https://vitejs.dev/) with `@tailwindcss/vite` plugin |
 
 ### File Structure
 
 ```
 tic-tac-toe-app/
 ├── index.html        # Static markup and DOM structure
-├── style.css         # All visual styling
+├── style.css         # Tailwind CSS v4 entry point + custom keyframes
 ├── game.js           # Game state, logic, and DOM rendering
 ├── game.test.js      # Jest test suite
+├── vite.config.js    # Vite configuration with Tailwind plugin
 ├── package.json
 └── package-lock.json
 ```
 
 | File | Responsibility |
 |---|---|
-| `index.html` | Declares the static DOM — the 3 × 3 button grid, status bar, result banner, and restart button. No logic lives here. |
-| `style.css` | Contains every visual rule: layout, colour scheme, animation keyframes, winning-cell highlight, reduced-motion overrides. |
+| `index.html` | Declares the static DOM — the 3 × 3 button grid, status bar, result banner, and restart button. Tailwind utility classes express all visual styling. |
+| `style.css` | Tailwind CSS v4 entry (`@import "tailwindcss"`), custom `@keyframes` (winPulse, fadeSlideIn), custom `@layer utilities` classes, and media-query overrides. |
 | `game.js` | Owns the game state object, all pure logic functions, the render cycle, and event-listener setup. Conditionally exports symbols for the Jest test environment. |
 | `game.test.js` | Jest test suite covering pure functions, state mutations via `handleCellClick`, `resetGame`, and DOM-integration assertions. |
+| `vite.config.js` | Registers the `@tailwindcss/vite` plugin; no additional configuration needed. |
 
 ### Architecture / State Model
 
@@ -104,7 +104,7 @@ if (typeof module !== "undefined" && module.exports) {
 }
 ```
 
-This means the same file works as a plain `<script>` in the browser and as a CommonJS module under Jest — no separate build required.
+This means the same file works as a Vite ES module in the browser (via `<script type="module">`) and as a CommonJS module under Jest — no separate test build required.
 
 ---
 
@@ -112,7 +112,7 @@ This means the same file works as a plain `<script>` in the browser and as a Com
 
 ### Prerequisites
 
-- **Node.js** — any current LTS release
+- **Node.js** — v20.19+ or v22.12+ (required by Vite)
 - **npm** — bundled with Node.js
 
 ### Steps
@@ -136,26 +136,28 @@ This means the same file works as a plain `<script>` in the browser and as a Com
    npm start
    ```
 
-> **No bundler or build tool is involved.** `live-server` watches the project directory and automatically reloads the browser whenever `game.js`, `style.css`, or `index.html` is saved — edits are reflected immediately.
+The Vite dev server starts at `http://localhost:5173` and opens the app with hot-module replacement (HMR) — edits to `index.html`, `style.css`, or `game.js` are reflected instantly without a full page reload.
 
 ---
 
 ## Running the App
 
-### Option A — with `live-server` (recommended for development)
+### Development (with HMR)
 
 ```bash
 npm install   # only needed once
 npm start
 ```
 
-`live-server` starts and opens the app in your default browser. It defaults to `http://127.0.0.1:8080`; if port 8080 is already occupied it will increment to the next available port.
+Vite starts and opens the app at `http://localhost:5173`.
 
-### Option B — open directly in a browser
+### Production build
 
-Open `index.html` in any modern browser — no installation or build step is required.
+```bash
+npm run build
+```
 
-> **Note:** when opening the file directly, `live-server`'s auto-reload will not be available. You will need to refresh the browser manually after making changes.
+An optimised bundle is written to `dist/`. Serve it with any static file server (e.g. `npx serve dist`).
 
 ---
 
@@ -166,7 +168,7 @@ npm install   # only needed if you haven't done so already
 npm test
 ```
 
-Jest runs with the `jsdom` environment (`--testEnvironment=jsdom`), so no real browser is required.
+Jest runs with the `jsdom` environment (`--testEnvironment=jsdom`), so no real browser is required. The Vite build step is not involved in testing — Jest loads `game.js` directly as a CommonJS module.
 
 ### What the test suite covers
 

@@ -9,85 +9,85 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/style.css" />
   </head>
-  <body>
-    <div class="app">
-      <header class="app-header">
-        <h1 class="app-title">Tic Tac Toe</h1>
+  <body class="bg-[#0f172a] text-slate-100 min-h-dvh flex items-center justify-center p-6 font-[Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe_UI',sans-serif]">
+    <div class="app w-full max-w-[520px] flex flex-col items-center gap-8">
+      <header class="text-center">
+        <h1 class="text-[clamp(1.75rem,6vw,2.5rem)] font-extrabold tracking-tight text-gradient-title">Tic Tac Toe</h1>
       </header>
 
-      <main class="game">
-        <div class="status-bar">
-          <p id="status-message" class="status-message" aria-live="polite">
+      <main class="game flex flex-col items-center gap-6 w-full">
+        <div class="flex items-center justify-center min-h-8">
+          <p id="status-message" class="text-lg font-semibold text-slate-400 tracking-wide transition-colors" aria-live="polite">
             Player X's turn
           </p>
         </div>
 
         <div
           id="board"
-          class="board"
+          class="board grid grid-cols-3 bg-[#1e293b] rounded-[20px] border border-slate-700 shadow-2xl"
           role="grid"
           aria-label="Tic Tac Toe board"
         >
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-0"
             data-index="0"
             role="gridcell"
             aria-label="Row 1, Column 1"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-1"
             data-index="1"
             role="gridcell"
             aria-label="Row 1, Column 2"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-2"
             data-index="2"
             role="gridcell"
             aria-label="Row 1, Column 3"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-3"
             data-index="3"
             role="gridcell"
             aria-label="Row 2, Column 1"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-4"
             data-index="4"
             role="gridcell"
             aria-label="Row 2, Column 2"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-5"
             data-index="5"
             role="gridcell"
             aria-label="Row 2, Column 3"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-6"
             data-index="6"
             role="gridcell"
             aria-label="Row 3, Column 1"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-7"
             data-index="7"
             role="gridcell"
             aria-label="Row 3, Column 2"
           ></button>
           <button
-            class="cell"
+            class="cell aspect-square bg-[#0f172a] border-2 border-slate-700 rounded-2xl cursor-pointer font-extrabold flex items-center justify-center transition-all min-w-[44px] min-h-[44px] select-none outline-none overflow-hidden relative"
             id="cell-8"
             data-index="8"
             role="gridcell"
@@ -95,16 +95,16 @@
           ></button>
         </div>
 
-        <div id="result-banner" class="result-banner" aria-live="assertive" hidden>
-          <p id="result-text" class="result-text"></p>
+        <div id="result-banner" class="animate-fade-slide-in bg-[#1e293b] border border-slate-700 rounded-xl px-8 py-4 text-center" aria-live="assertive" hidden>
+          <p id="result-text" class="text-2xl font-bold text-slate-100 tracking-tight"></p>
         </div>
 
-        <button id="restart-btn" class="restart-btn" type="button">
+        <button id="restart-btn" class="font-bold text-white bg-indigo-600 border-none rounded-xl px-8 py-3 cursor-pointer transition-all shadow-[0_4px_14px_rgba(79,70,229,0.35)] min-h-[44px] outline-none hover:bg-indigo-500 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-indigo-400" type="button">
           Restart Game
         </button>
       </main>
     </div>
 
-    <script src="game.js"></script>
+    <script type="module" src="/game.js"></script>
   </body>
 </html>

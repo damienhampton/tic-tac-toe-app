@@ -127,11 +127,24 @@ function render() {
       cellEl.removeAttribute("data-mark");
     }
 
-    // Winning highlight
+    // Winning highlight — keep 'winning' class for test compatibility,
+    // add Tailwind animation and colour utility classes alongside it
     if (state.winningLine && state.winningLine.includes(i)) {
-      cellEl.classList.add("winning");
+      cellEl.classList.add("winning", "animate-win-pulse");
+      if (state.winner === "X") {
+        cellEl.classList.add("cell-winning-x");
+        cellEl.classList.remove("cell-winning-o");
+      } else {
+        cellEl.classList.add("cell-winning-o");
+        cellEl.classList.remove("cell-winning-x");
+      }
     } else {
-      cellEl.classList.remove("winning");
+      cellEl.classList.remove(
+        "winning",
+        "animate-win-pulse",
+        "cell-winning-x",
+        "cell-winning-o"
+      );
     }
 
     // Disable occupied or game-over cells
@@ -139,6 +152,7 @@ function render() {
   }
 
   // Board-level game-over class (CSS pointer-events guard)
+  // Keep 'game-over' class for test compatibility
   if (state.winner !== null) {
     boardEl.classList.add("game-over");
   } else {
@@ -148,13 +162,20 @@ function render() {
   // Status message (turn indicator)
   if (state.winner === null) {
     statusEl.textContent = `Player ${state.currentPlayer}'s turn`;
-    statusEl.className = `status-message player-${state.currentPlayer.toLowerCase()}`;
+    // Update colour classes for current player
+    statusEl.classList.remove("status-player-x", "status-player-o", "text-slate-400");
+    if (state.currentPlayer === "X") {
+      statusEl.classList.add("status-player-x");
+    } else {
+      statusEl.classList.add("status-player-o");
+    }
     resultBanner.hidden = true;
     resultText.textContent = "";
   } else {
     // Hide turn indicator while result is shown
     statusEl.textContent = "";
-    statusEl.className = "status-message";
+    statusEl.classList.remove("status-player-x", "status-player-o");
+    statusEl.classList.add("text-slate-400");
 
     // Result banner
     if (state.winner === "draw") {
